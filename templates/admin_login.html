@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}MobStore | Admin Login{% endblock %}
+{% block content %}
+<section class="auth-section">
+    <div class="auth-card glass-card reveal">
+        <span class="eyebrow">Admin Console</span>
+        <h1>Sign in as admin</h1>
+        <p>Manage inventory, orders, revenue, and service requests from one dashboard.</p>
+        <form method="POST" class="auth-form">
+            <input type="text" name="username" placeholder="Admin username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button class="btn btn-dark" type="submit">Enter dashboard</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

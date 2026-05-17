@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}MobStore | Service Center{% endblock %}
+{% block content %}
+<section class="container page-intro reveal">
+    <span class="eyebrow">After-Sales Support</span>
+    <h1>Warranty and service center</h1>
+    <p>Submit device issues using the order IMEI and review recent service activity.</p>
+</section>
+
+<section class="container section-block">
+    <div class="service-layout">
+        <form class="glass-card service-form reveal" method="POST">
+            <h3>Submit service request</h3>
+            <label for="imei">Device IMEI</label>
+            <input id="imei" type="text" name="imei" placeholder="Enter your warranty IMEI" required>
+            <label for="problem">Problem description</label>
+            <textarea id="problem" name="problem" rows="5" placeholder="Describe the issue clearly" required></textarea>
+            <button class="btn btn-dark" type="submit">Submit request</button>
+        </form>
+        <div class="glass-card reveal">
+            <h3>Recent requests</h3>
+            {% if recent_requests %}
+                {% for item in recent_requests %}
+                <div class="service-item">
+                    <div>
+                        <strong>{{ item.imei }}</strong>
+                        <p>{{ item.issue }}</p>
+                    </div>
+                    <span class="stock-tag in-stock">{{ item.status }}</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="muted-copy">Login and submit a service request to see your activity history here.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

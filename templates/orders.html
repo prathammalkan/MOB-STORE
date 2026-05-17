@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}MobStore | My Orders{% endblock %}
+{% block content %}
+<section class="container page-intro reveal">
+    <span class="eyebrow">Customer Account</span>
+    <h1>Your orders</h1>
+    <p>Review purchased devices, invoice-ready totals, and the current status of each order.</p>
+</section>
+
+<section class="container section-block">
+    <div class="stack-panel">
+        {% for order in orders %}
+        <article class="glass-card reveal">
+            <div class="invoice-top">
+                <div>
+                    <span class="eyebrow">Order #{{ order.id }}</span>
+                    <h3>{{ order.order_date.strftime('%d %b %Y') }}</h3>
+                </div>
+                <div class="invoice-meta">
+                    <span>{{ order.units }} units</span>
+                    <span class="stock-tag in-stock">{{ order.status }}</span>
+                    <span>Rs {{ currency(order.total_price) }}</span>
+                </div>
+            </div>
+
+            <div class="invoice-lines">
+                {% for item in order.items %}
+                <div class="checkout-line">
+                    <div>
+                        <strong>{{ item.product_name }}</strong>
+                        <p>{{ item.quantity }} x Rs {{ currency(item.price) }}</p>
+                    </div>
+                    <strong>Rs {{ currency(item.line_total) }}</strong>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="button-row mt-3">
+                <a class="btn btn-outline-light" href="{{ url_for('invoice', order_id=order.id) }}">Open invoice</a>
+                <a class="btn btn-dark" href="{{ url_for('service') }}">Need service</a>
+            </div>
+        </article>
+        {% else %}
+        <div class="glass-card empty-state reveal">
+            <h3>No orders yet.</h3>
+            <p>Your completed purchases will appear here with invoice access.</p>
+            <a class="btn btn-dark" href="{{ url_for('store') }}">Start shopping</a>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

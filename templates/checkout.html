@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}MobStore | Checkout{% endblock %}
+{% block content %}
+<section class="container page-intro reveal">
+    <span class="eyebrow">Checkout</span>
+    <h1>Confirm and place order</h1>
+    <p>Your order will be saved in PostgreSQL and an IMEI-backed invoice will be generated instantly.</p>
+</section>
+
+<section class="container section-block">
+    <div class="checkout-layout">
+        <div class="glass-card reveal">
+            <h3 class="mb-4">Order items</h3>
+            {% for item in items %}
+            <div class="checkout-line">
+                <div>
+                    <strong>{{ item.brand }} {{ item.model }}</strong>
+                    <p>{{ item.quantity }} x Rs {{ currency(item.price) }}</p>
+                </div>
+                <strong>Rs {{ currency(item.subtotal) }}</strong>
+            </div>
+            {% endfor %}
+        </div>
+        <form class="glass-card checkout-card reveal" method="POST">
+            <span class="eyebrow">Secure Checkout</span>
+            <h3>Place order</h3>
+            <p class="mb-4">Orders are created under <strong>{{ session.get('user_email') }}</strong>.</p>
+            <div class="summary-row"><span>Total payable</span><strong>Rs {{ currency(total) }}</strong></div>
+            <button class="btn btn-dark w-100 mt-4" type="submit">Confirm purchase</button>
+            <a class="btn btn-outline-light w-100 mt-2" href="{{ url_for('cart') }}">Back to cart</a>
+        </form>
+    </div>
+</section>
+{% endblock %}

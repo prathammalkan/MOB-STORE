@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}MobStore | Cart{% endblock %}
+{% block content %}
+<section class="container page-intro reveal">
+    <span class="eyebrow">Shopping Cart</span>
+    <h1>Review your order</h1>
+    <p>Adjust quantities, remove items, and continue to a connected checkout.</p>
+</section>
+
+<section class="container section-block">
+    <div class="cart-layout">
+        <div class="cart-list">
+            {% for item in items %}
+            <article class="glass-card cart-item reveal">
+                <img src="{{ item.image_url or '' }}" alt="{{ item.model }}">
+                <div class="cart-copy">
+                    <span class="product-brand">{{ item.brand }}</span>
+                    <h3>{{ item.model }}</h3>
+                    <p>Unit price: Rs {{ currency(item.price) }}</p>
+                </div>
+                <form class="cart-quantity" method="POST" action="{{ url_for('update_cart', product_id=item.product_id) }}">
+                    <label>Qty</label>
+                    <input type="number" name="quantity" min="1" max="{{ item.stock }}" value="{{ item.quantity }}">
+                    <button class="btn btn-outline-light btn-sm" type="submit">Update</button>
+                </form>
+                <div class="cart-total">
+                    <strong>Rs {{ currency(item.subtotal) }}</strong>
+                    <a class="text-link danger-link" href="{{ url_for('remove_cart', product_id=item.product_id) }}">Remove</a>
+                </div>
+            </article>
+            {% else %}
+            <div class="glass-card empty-state reveal">
+                <h3>Your cart is empty.</h3>
+                <p>Add a device from the store to start checkout.</p>
+                <a class="btn btn-dark" href="{{ url_for('store') }}">Back to store</a>
+            </div>
+            {% endfor %}
+        </div>
+        <aside class="glass-card summary-card reveal">
+            <span class="eyebrow">Order Summary</span>
+            <h3>Checkout ready</h3>
+            <div class="summary-row"><span>Items</span><strong>{{ items|length }}</strong></div>
+            <div class="summary-row"><span>Total</span><strong>Rs {{ currency(total) }}</strong></div>
+            <a class="btn btn-dark w-100 mt-3" href="{{ url_for('checkout') }}">Proceed to checkout</a>
+            <a class="btn btn-outline-light w-100 mt-2" href="{{ url_for('store') }}">Continue shopping</a>
+        </aside>
+    </div>
+</section>
+{% endblock %}

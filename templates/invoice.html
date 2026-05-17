@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}MobStore | Invoice #{{ order.id }}{% endblock %}
+{% block content %}
+<section class="container section-block">
+    <div class="invoice-shell glass-card reveal">
+        <div class="invoice-top">
+            <div>
+                <span class="eyebrow">Invoice</span>
+                <h1>Order #{{ order.id }}</h1>
+            </div>
+            <div class="invoice-meta">
+                <span>{{ order.order_date.strftime('%d %b %Y') }}</span>
+                <span>{{ order.user_email }}</span>
+                <span>{{ order.status }}</span>
+            </div>
+        </div>
+
+        <div class="invoice-lines">
+            {% for item in items %}
+            <div class="checkout-line">
+                <div>
+                    <strong>{{ item.product_name }}</strong>
+                    <p>{{ item.quantity }} x Rs {{ currency(item.price) }}</p>
+                </div>
+                <strong>Rs {{ currency(item.line_total) }}</strong>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="invoice-imei">
+            <label for="imeiBox">Warranty IMEI</label>
+            <div class="copy-row">
+                <input id="imeiBox" value="{{ order.imei }}" readonly>
+                <button class="btn btn-dark" type="button" data-copy-target="imeiBox">Copy</button>
+            </div>
+        </div>
+
+        <div class="invoice-bottom">
+            <strong>Total paid: Rs {{ currency(order.total_price) }}</strong>
+            <div class="button-row">
+                <button class="btn btn-outline-light" type="button" onclick="window.print()">Print invoice</button>
+                <a class="btn btn-dark" href="{{ url_for('store') }}">Back to store</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

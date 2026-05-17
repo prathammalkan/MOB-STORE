@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}MobStore | Edit Product{% endblock %}
+{% block content %}
+<section class="container section-block">
+    <div class="glass-card admin-form reveal narrow-form">
+        <div class="section-heading compact">
+            <span class="eyebrow">Inventory</span>
+            <h1>Edit product</h1>
+        </div>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-grid">
+                <input type="text" name="brand" value="{{ product.brand }}" placeholder="Brand" required>
+                <input type="text" name="model" value="{{ product.model }}" placeholder="Model" required>
+                <input type="number" name="price" value="{{ product.price }}" placeholder="Price" min="0" required>
+                <input type="number" name="stock" value="{{ product.stock }}" placeholder="Stock" min="0" required>
+                <input type="text" name="ram" value="{{ product.ram }}" placeholder="RAM">
+                <input type="text" name="storage" value="{{ product.storage }}" placeholder="Storage">
+                <input type="text" name="battery" value="{{ product.battery }}" placeholder="Battery">
+                <input type="text" name="category" value="{{ product.category }}" placeholder="Category">
+            </div>
+            <textarea name="description" rows="5" placeholder="Description">{{ product.description }}</textarea>
+            <input type="url" name="image_url" value="{{ product.image_url }}" placeholder="Image URL">
+            <input type="file" name="image" accept="image/*">
+            <div class="button-row">
+                <button class="btn btn-dark" type="submit">Save changes</button>
+                <a class="btn btn-outline-light" href="{{ url_for('admin_dashboard') }}">Back</a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

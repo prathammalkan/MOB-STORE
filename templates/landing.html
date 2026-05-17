@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}MobStore | Premium Mobile Store{% endblock %}
+{% block content %}
+<section class="hero-section">
+    <div class="container">
+        <div class="hero-grid">
+            <div class="hero-copy reveal">
+                <span class="eyebrow">Premium Mobile Retail</span>
+                <h1>Redesigned storefront with real buying, service, and admin workflows.</h1>
+                <p>Browse flagship phones, manage carts, place orders, track warranty IMEI, and run inventory from a fully connected backend.</p>
+                <div class="hero-actions">
+                    <a class="btn btn-dark btn-lg" href="{{ url_for('store') }}">Explore Store</a>
+                    <a class="btn btn-outline-light btn-lg" href="{{ url_for('service') }}">Open Service Center</a>
+                </div>
+                <div class="hero-stats">
+                    <div><strong>{{ stats.products }}</strong><span>Products</span></div>
+                    <div><strong>{{ stats.users }}</strong><span>Customers</span></div>
+                    <div><strong>{{ stats.orders }}</strong><span>Orders</span></div>
+                </div>
+            </div>
+            <div class="hero-panel reveal">
+                <div class="glass-card flagship-card">
+                    <p class="mini-label">Flagship Showcase</p>
+                    {% if featured_products %}
+                    <img src="{{ featured_products[0].image_url or '' }}" alt="{{ featured_products[0].model }}">
+                    <div class="flagship-meta">
+                        <div>
+                            <span>{{ featured_products[0].brand }}</span>
+                            <h3>{{ featured_products[0].model }}</h3>
+                        </div>
+                        <strong>Rs {{ currency(featured_products[0].price) }}</strong>
+                    </div>
+                    {% else %}
+                    <div class="placeholder-panel">Inventory preview will appear here.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="container section-block">
+    <div class="section-heading reveal">
+        <span class="eyebrow">Why It Works</span>
+        <h2>Same theme, higher-end execution.</h2>
+    </div>
+    <div class="feature-grid">
+        <article class="glass-card reveal">
+            <h3>Interactive Store</h3>
+            <p>Search, filter, review details, add to cart, and check out through a connected product pipeline.</p>
+        </article>
+        <article class="glass-card reveal">
+            <h3>Admin on PostgreSQL</h3>
+            <p>Products, orders, users, revenue, and service requests are stored in PostgreSQL and ready for Railway deployment.</p>
+        </article>
+        <article class="glass-card reveal">
+            <h3>Cloudinary-Ready Images</h3>
+            <p>Admin uploads can go to Cloudinary when credentials are present, with direct URL fallback when needed.</p>
+        </article>
+    </div>
+</section>
+
+<section class="container section-block">
+    <div class="section-heading reveal">
+        <span class="eyebrow">Featured Inventory</span>
+        <h2>Current spotlight devices</h2>
+    </div>
+    <div class="product-grid">
+        {% for product in featured_products %}
+        <article class="product-card reveal">
+            <a class="card-media" href="{{ url_for('product', product_id=product.id) }}">
+                <img src="{{ product.image_url or '' }}" alt="{{ product.model }}">
+            </a>
+            <div class="card-body">
+                <span class="product-brand">{{ product.brand }}</span>
+                <h3>{{ product.model }}</h3>
+                <p>{{ product.description }}</p>
+                <div class="card-bottom">
+                    <strong>Rs {{ currency(product.price) }}</strong>
+                    <a class="text-link" href="{{ url_for('product', product_id=product.id) }}">View product</a>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

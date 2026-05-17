@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}MobStore | Store{% endblock %}
+{% block content %}
+<section class="container page-intro reveal">
+    <span class="eyebrow">Storefront</span>
+    <h1>Shop premium smartphones</h1>
+    <p>Everything here is connected to inventory, cart, checkout, and admin data.</p>
+</section>
+
+<section class="container section-block">
+    <form class="filter-bar reveal" method="GET">
+        <input type="text" name="search" value="{{ filters.search }}" placeholder="Search by brand, model, or feature">
+        <select name="brand">
+            <option value="">All brands</option>
+            {% for item in brands %}
+            <option value="{{ item.brand }}" {% if filters.brand == item.brand %}selected{% endif %}>{{ item.brand }}</option>
+            {% endfor %}
+        </select>
+        <select name="category">
+            <option value="">All categories</option>
+            {% for item in categories %}
+            <option value="{{ item.category }}" {% if filters.category == item.category %}selected{% endif %}>{{ item.category }}</option>
+            {% endfor %}
+        </select>
+        <select name="sort">
+            <option value="latest" {% if filters.sort == 'latest' %}selected{% endif %}>Latest</option>
+            <option value="price_low" {% if filters.sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+            <option value="price_high" {% if filters.sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+            <option value="brand" {% if filters.sort == 'brand' %}selected{% endif %}>Brand</option>
+        </select>
+        <button class="btn btn-dark" type="submit">Apply</button>
+    </form>
+
+    <div class="product-grid">
+        {% for product in products %}
+        <article class="product-card reveal">
+            <a class="card-media" href="{{ url_for('product', product_id=product.id) }}">
+                <img src="{{ product.image_url or '' }}" alt="{{ product.model }}">
+            </a>
+            <div class="card-body">
+                <div class="product-meta">
+                    <span class="product-brand">{{ product.brand }}</span>
+                    <span class="stock-tag {% if product.stock > 0 %}in-stock{% else %}out-stock{% endif %}">
+                        {% if product.stock > 0 %}{{ product.stock }} in stock{% else %}Sold out{% endif %}
+                    </span>
+                </div>
+                <h3>{{ product.model }}</h3>
+                <p>{{ product.description or 'Premium smartphone with standout performance and flagship styling.' }}</p>
+                <div class="spec-row">
+                    <span>{{ product.ram or 'NA' }}</span>
+                    <span>{{ product.storage or 'NA' }}</span>
+                    <span>{{ product.battery or 'NA' }}</span>
+                </div>
+                <div class="card-bottom">
+                    <strong>Rs {{ currency(product.price) }}</strong>
+                    <div class="button-row">
+                        <a class="btn btn-outline-light btn-sm" href="{{ url_for('product', product_id=product.id) }}">Details</a>
+                        <a class="btn btn-dark btn-sm" href="{{ url_for('add_to_cart', product_id=product.id) }}">Add to cart</a>
+                    </div>
+                </div>
+            </div>
+        </article>
+        {% else %}
+        <div class="empty-state reveal">
+            <h3>No products matched your filters.</h3>
+            <p>Try a broader search or clear the current brand/category filters.</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

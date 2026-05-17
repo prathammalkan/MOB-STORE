@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}MobStore | Admin Dashboard{% endblock %}
+{% block content %}
+<section class="container page-intro reveal">
+    <span class="eyebrow">Admin Dashboard</span>
+    <h1>Store operations in one place</h1>
+    <p>Products, orders, revenue, and service requests are all connected to PostgreSQL.</p>
+</section>
+
+<section class="container section-block">
+    <div class="stat-grid">
+        <div class="glass-card reveal"><span>Total Users</span><strong>{{ stats.users }}</strong></div>
+        <div class="glass-card reveal"><span>Total Orders</span><strong>{{ stats.orders }}</strong></div>
+        <div class="glass-card reveal"><span>Inventory</span><strong>{{ stats.products }}</strong></div>
+        <div class="glass-card reveal"><span>Revenue</span><strong>Rs {{ currency(stats.revenue) }}</strong></div>
+    </div>
+</section>
+
+<section class="container section-block admin-grid">
+    <form class="glass-card reveal admin-form" method="POST" enctype="multipart/form-data">
+        <div class="section-heading compact">
+            <span class="eyebrow">Inventory</span>
+            <h2>Add product</h2>
+        </div>
+        <div class="form-grid">
+            <input type="text" name="brand" placeholder="Brand" required>
+            <input type="text" name="model" placeholder="Model" required>
+            <input type="number" name="price" placeholder="Price" min="0" required>
+            <input type="number" name="stock" placeholder="Stock" min="0" required>
+            <input type="text" name="ram" placeholder="RAM">
+            <input type="text" name="storage" placeholder="Storage">
+            <input type="text" name="battery" placeholder="Battery">
+            <input type="text" name="category" placeholder="Category">
+        </div>
+        <textarea name="description" rows="4" placeholder="Product description"></textarea>
+        <input type="url" name="image_url" placeholder="Image URL fallback">
+        <input type="file" name="image" accept="image/*">
+        <small class="muted-copy">
+            {% if cloudinary_enabled %}
+            Cloudinary upload is enabled. File uploads will be stored there.
+            {% else %}
+            Cloudinary is not configured. Use an image URL or add Cloudinary env vars on Railway.
+            {% endif %}
+        </small>
+        <button class="btn btn-dark" type="submit">Add product</button>
+    </form>
+
+    <div class="stack-panel">
+        <div class="glass-card reveal">
+            <div class="section-heading compact">
+                <span class="eyebrow">Recent Orders</span>
+                <h2>Latest activity</h2>
+            </div>
+            {% for order in orders %}
+            <div class="service-item admin-service-item">
+                <div>
+                    <strong>#{{ order.id }} · {{ order.user_email }}</strong>
+                    <p>{{ order.units }} units · {{ order.order_date.strftime('%d %b %Y') }}</p>
+                </div>
+                <form method="POST" action="{{ url_for('update_order_status', order_id=order.id) }}">
+                    <select name="status">
+                        <option value="Completed" {% if order.status == 'Completed' %}selected{% endif %}>Completed</option>
+                        <option value="Processing" {% if order.status == 'Processing' %}selected{% endif %}>Processing</option>
+                        <option value="Shipped" {% if order.status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                        <option value="Delivered" {% if order.status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                    </select>
+                    <button class="btn btn-outline-light btn-sm" type="submit">Save</button>
+                </form>
+                <span class="stock-tag in-stock">Rs {{ currency(order.total_price) }}</span>
+            </div>
+            {% else %}
+            <p class="muted-copy">No orders yet.</p>
+            {% endfor %}
+        </div>
+
+        <div class="glass-card reveal">
+            <div class="section-heading compact">
+                <span class="eyebrow">Support Queue</span>
+                <h2>Service requests</h2>
+            </div>
+            {% for item in service_requests %}
+            <div class="service-item admin-service-item">
+                <div>
+                    <strong>{{ item.imei }}</strong>
+                    <p>{{ item.issue }}</p>
+                </div>
+                <form method="POST" action="{{ url_for('update_service_status', request_id=item.id) }}">
+                    <select name="status">
+                        <option value="Pending" {% if item.status == 'Pending' %}selected{% endif %}>Pending</option>
+                        <option value="In Progress" {% if item.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                        <option value="Resolved" {% if item.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                    </select>
+                    <button class="btn btn-outline-light btn-sm" type="submit">Save</button>
+                </form>
+            </div>
+            {% else %}
+            <p class="muted-copy">No service requests yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="container section-block">
+    <div class="glass-card reveal inventory-table-wrap">
+        <div class="section-heading compact">
+            <span class="eyebrow">Product Inventory</span>
+            <h2>Manage products</h2>
+        </div>
+        <div class="inventory-table">
+            <table class="table table-dark table-borderless align-middle">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Category</th>
+                        <th>Stock</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>
+                            <div class="inventory-product">
+                                <img src="{{ product.image_url or '' }}" alt="{{ product.model }}">
+                                <div>
+                                    <strong>{{ product.brand }} {{ product.model }}</strong>
+                                    <p>{{ product.ram or 'NA' }} / {{ product.storage or 'NA' }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ product.category }}</td>
+                        <td>{{ product.stock }}</td>
+                        <td>Rs {{ currency(product.price) }}</td>
+                        <td class="button-row">
+                            <a class="btn btn-outline-light btn-sm" href="{{ url_for('edit_product', product_id=product.id) }}">Edit</a>
+                            <a class="btn btn-danger btn-sm" data-confirm="Delete {{ product.brand }} {{ product.model }}?" href="{{ url_for('delete_product', product_id=product.id) }}">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}
