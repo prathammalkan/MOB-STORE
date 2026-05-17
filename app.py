@@ -304,9 +304,18 @@ def ensure_schema():
                 admin_username = os.environ.get("ADMIN_USERNAME", "admin")
                 admin_password = os.environ.get("ADMIN_PASSWORD")
                 if not admin_password:
-                    raise RuntimeError(
-                        "ADMIN_PASSWORD env var is required but not set. "
-                        "Please configure it before deploying."
+                    import secrets as _sec
+                    admin_password = _sec.token_urlsafe(16)
+                    print(
+                        "\n" + "=" * 60 + "\n"
+                        "  ADMIN_PASSWORD env var is not set.\n"
+                        f"  A one-time password has been generated:\n\n"
+                        f"      Username : {admin_username}\n"
+                        f"      Password : {admin_password}\n\n"
+                        "  Set ADMIN_PASSWORD in your environment to keep\n"
+                        "  a stable password across restarts.\n"
+                        + "=" * 60 + "\n",
+                        flush=True,
                     )
                 cur.execute(
                     """
