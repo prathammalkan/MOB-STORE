@@ -969,7 +969,26 @@ def update_service_status(request_id):
 
 
 configure_cloudinary()
-ensure_schema()
+
+# Lazy schema initialisation — runs once on the first request so that
+# Vercel serverless cold-starts don't crash at import time when the
+# database connection is not yet available.
+_schema_initialised = False
+
+
+@app.before_request
+def _lazy_ensure_schema():
+    global _schema_initialised
+    if not _schema_initialised:
+        try:
+            ensure_schema()
+            _schema_initialised = True
+        except Exception as exc:  # noqa: BLE001
+            # Log but don't crash — the route handler will surface a proper
+            # error when it tries to use the database.
+            import traceback
+            traceback.print_exc()
+            print(f"[WARN] Schema initialisation failed: {exc}", flush=True)
 
 
 if __name__ == "__main__":
