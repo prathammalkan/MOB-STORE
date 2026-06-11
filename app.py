@@ -993,5 +993,16 @@ def _lazy_ensure_schema():
             print(f"[WARN] Schema initialisation failed: {exc}", flush=True)
 
 
+@app.errorhandler(Exception)
+def handle_exception(e):
+    # Pass through HTTP errors
+    from werkzeug.exceptions import HTTPException
+    if isinstance(e, HTTPException):
+        return e
+    import traceback
+    tb = traceback.format_exc()
+    return f"<h1>Internal Server Error</h1><p>An unexpected error occurred:</p><pre>{tb}</pre>", 500
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
