@@ -17,18 +17,18 @@ except ImportError:  # Optional in local development until dependencies are inst
 
 
 app = Flask(__name__)
-_secret_key = os.environ.get("SECRET_KEY")
-if not _secret_key:
-    import secrets as _secrets
-    _secret_key = _secrets.token_hex(32)
-    import warnings as _warnings
-    _warnings.warn(
-        "SECRET_KEY env var is not set. A temporary random key has been generated. "
-        "All sessions will be invalidated on every restart. Set SECRET_KEY in production.",
-        RuntimeWarning,
-        stacklevel=2,
-    )
+_secret_key = os.environ.get("SECRET_KEY", "fallback-secret-for-development")
 app.secret_key = _secret_key
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    from werkzeug.exceptions import HTTPException
+    if isinstance(e, HTTPException):
+        return e
+    import traceback
+    tb = traceback.format_exc()
+    return f"<h1>Internal Server Error</h1><p>An unexpected error occurred:</p><pre>{tb}</pre>", 500
+
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
 app.config["SESSION_COOKIE_HTTPONLY"] = True

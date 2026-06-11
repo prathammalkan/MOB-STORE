@@ -3,3 +3,4 @@ database.db
 venv/
 .env
 .env.local
+.vercel
