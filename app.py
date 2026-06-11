@@ -100,6 +100,8 @@ def connect():
     database_url = os.environ.get("DATABASE_URL")
     if not database_url:
         raise RuntimeError("DATABASE_URL is not configured.")
+    if database_url.startswith("postgres://"):
+        database_url = database_url.replace("postgres://", "postgresql://", 1)
     return psycopg2.connect(database_url, cursor_factory=extras.RealDictCursor)
 
 
